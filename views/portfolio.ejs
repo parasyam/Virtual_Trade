@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvestGo - Portfolio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: white;
+    }
+
+    nav img {
+      height: 10vh;
+    }
+
+    .navbar-nav .nav-item .nav-link {
+      font-size: 16px;
+    }
+
+    .sell-button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .sell-button:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#"><img src="/logo-removebg-preview.png" alt="Logo"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="../index.html">Home</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h2>Portfolio Overview</h2>
+
+    <div class="alert alert-info">
+      <strong>Total Investment:</strong> ₹<%= totalInvestment.toFixed(2) %> <br>
+      <strong>Profit/Loss:</strong> ₹<%= (presentValue - totalInvestment).toFixed(2) %> <br>
+      <strong>Realized Profit:</strong> ₹<%= realizedProfit.toFixed(2) %>
+  </div>
+  
+
+    <h2>All Stocks</h2>
+    <div class="row">
+      <% if (stocks.length> 0) { %>
+        <% stocks.forEach(stock=> { %>
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <%= stock.symbol %>
+                </h5>
+                <p class="card-text">Price: ₹<%= stock.currentPrice %>
+                </p>
+                <p class="card-text">Quantity: <%= stock.quantity %>
+                </p>
+                <p class="card-text">Invested: ₹<%= (stock.quantity * stock.pastPrice).toFixed(2) %>
+                </p>
+                <p class="card-text">Profit/Loss: ₹<%= ((stock.currentPrice - stock.pastPrice) *
+                    stock.quantity).toFixed(2) %>
+                </p>
+                <button class="sell-button" data-symbol="<%- stock.symbol %>" 
+                  data-quantity="<%- stock.quantity %>" 
+                  data-current-price="<%- stock.currentPrice %>" 
+                  data-past-price="<%- stock.pastPrice %>">
+                  Sell
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+            <% } else { %>
+              <p>No stocks available.</p>
+              <% } %>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".sell-button").forEach(button => {
+        button.addEventListener("click", function () {
+          const stockName = this.getAttribute("data-symbol");
+          const quantity = Number(this.getAttribute("data-quantity"));
+          const currentPrice = Number(this.getAttribute("data-current-price"));
+          const pastPrice = Number(this.getAttribute("data-past-price"));
+  
+          sellStock(stockName, quantity, currentPrice, pastPrice);
+        });
+      });
+    });
+  
+    async function sellStock(stockName, quantity, currentPrice, pastPrice) {
+      const sellQuantity = Number(prompt(`Enter quantity to sell (Max: ${quantity}):`, quantity));
+  
+      if (!sellQuantity || isNaN(sellQuantity) || sellQuantity <= 0 || sellQuantity > quantity) {
+        alert("Invalid quantity.");
+        return;
+      }
+  
+      try {
+        const response = await fetch("/stock/sell", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stockName: stockName,
+            quantityToSell: sellQuantity,
+            sellPrice: currentPrice,
+            buyPrice: pastPrice
+          })
+        });
+  
+        let data = await response.json();
+  
+        if (!response.ok) {
+          alert(data.error || "Failed to sell stock.");
+          return;
+        }
+  
+        alert(`Stock sold successfully! New Realized Profit: ₹${data.realizedProfit}`);
+        window.location.reload();
+      } catch (error) {
+        console.error("Error selling stock:", error);
+        alert("Failed to communicate with the server.");
+      }
+    }
+  </script>
+  
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
