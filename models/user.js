@@ -33,7 +33,9 @@ const userSchema=new mongoose.Schema({
         type:String,
         required:true,
     },
+    funds: { type: Number, default: 1000000 },
     favoriteStocks: [stockSchema],
+    watchlist: [String],
     realizedProfit: { type: Number, default: 0 }
 })
 const User=mongoose.model("User",userSchema);

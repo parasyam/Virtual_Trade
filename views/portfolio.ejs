@@ -68,10 +68,11 @@
     <h2>Portfolio Overview</h2>
 
     <div class="alert alert-info">
-      <strong>Total Investment:</strong> ₹<%= totalInvestment.toFixed(2) %> <br>
-      <strong>Profit/Loss:</strong> ₹<%= (presentValue - totalInvestment).toFixed(2) %> <br>
-      <strong>Realized Profit:</strong> ₹<%= realizedProfit.toFixed(2) %>
-  </div>
+      <strong>Funds Available:</strong> ₹<%= AvaliableFunds.toFixed(0) %><br>
+      <strong>Realized Profit:</strong> ₹<%= realizedProfit.toFixed(0) %><br>
+      <strong>Total Investment:</strong> ₹<%= totalInvestment.toFixed(0) %> <br>
+      <strong>Profit/Loss:</strong> ₹<%= (presentValue - totalInvestment).toFixed(0) %> <br>
+    </div>
   
 
     <h2>All Stocks</h2>

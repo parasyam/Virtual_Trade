@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profit Leaderboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; }
+    h1 { text-align: center; color: #333; }
+    table { width: 80%; margin: 20px auto; border-collapse: collapse; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    th, td { padding: 15px; text-align: center; border-bottom: 1px solid #ddd; }
+    th { background-color: #4CAF50; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .gold { background-color: #ffd700 !important; font-weight: bold; }
+    .silver { background-color: #c0c0c0 !important; font-weight: bold; }
+    .bronze { background-color: #cd7f32 !important; font-weight: bold; }
+    .profit-positive {
+    color: green;
+}
+.profit-negative {
+    color: red;
+}
+  </style>
+</head>
+<body>
+
+<h1>🏆 Profit Leaderboard 🏆</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>User Name</th>
+      <th>Email</th>
+      <th>Realized Profit (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% users.forEach((user, index) => { %>
+      <tr class="<%= index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '' %>">
+        <td><%= index + 1 %></td>
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+       
+        <td class="<%= user.realizedProfit >= 0 ? 'profit-positive' : 'profit-negative' %>">₹<%= user.realizedProfit %></td>
+
+
+       
+
+
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+</body>
+</html>

@@ -11,6 +11,7 @@ const { connectDB } = require('./connection.js');
 const { cheackAuth } = require('./middleware/auth.js');
 
 // Middlewares
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

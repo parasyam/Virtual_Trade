@@ -224,5 +224,6 @@ module.exports = {
     handleStockDetails,
     handleAddPortfolio,
     handlePortfolio,
-    handlesellStock
+    handlesellStock,
+   
 };

@@ -242,6 +242,16 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+    .add-to-watchlist-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
         
     </style>
 </head>
@@ -320,6 +330,13 @@
   data-stock='{"symbol": "<%= symbol %>", "stockPrice": <%= stockPrice %>}'>
   Add to portfolio
 </button>
+
+<button id="addToWatchlistBtn" class="add-to-watchlist-btn" 
+  data-stock='{"symbol": "<%= symbol %>"}'>
+  Add to Watchlist
+</button>
+
+
   <div id="result"></div>
 
   <script>
@@ -420,6 +437,25 @@
     };
 });
 
+
+document.getElementById("addToWatchlistBtn").addEventListener("click", function () {
+      console.log("Watchlist click");
+      const stockData = JSON.parse(this.getAttribute("data-stock"));
+      const stockName = stockData.symbol;
+
+      // API call to add the stock to watchlist
+      fetch("/stock/add-watchlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stockSymbol: stockName })
+        })
+      .then(response => response.json())
+      .then(data => {
+          alert(data.message);  // Show success or error
+      })
+      .catch(error => console.error("Error adding to watchlist:", error));
+  });
+
     document.addEventListener("DOMContentLoaded", function() {
         var ctx = document.getElementById('fdchart').getContext('2d');
 
@@ -438,6 +474,8 @@
         });
 
       });
+
+
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
