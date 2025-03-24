@@ -7,76 +7,29 @@
   <title>InvestGo - Watchlist</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
-  <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: white;
-    }
+  <link rel="stylesheet" href="/styles/whatchlist.css">
 
-    nav img {
-      height: 10vh;
-    }
-
-    .navbar-nav .nav-item .nav-link {
-      font-size: 16px;
-    }
-
-    .remove-button {
-      background-color: red;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .remove-button:hover {
-      background-color: darkred;
-    }
-
-    .add-btn {
-      background-color: green;
-      color: white;
-      border-radius: 5px;
-      padding: 8px 16px;
-      margin-bottom: 20px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .add-btn:hover {
-      background-color: darkgreen;
-    }
-  </style>
+ 
 </head>
 
 <body>
-
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#"><img src="/logo-removebg-preview.png" alt="Logo"></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" href="../index.html">Home</a>
-          </li>
-        </ul>
-      </div>
+  <nav>
+    <h1>InvestGrow</h1>
+    <div>
+      <a href="/stock-search">Stocks</a>
+      <a href="/stock/Portfolio">Portfolio</a>
+      <a href="/stock/leaderboard">Leaderboard</a>
+      <a href="/user/logout">Log Out</a>
     </div>
   </nav>
-
   <div class="container mt-4">
+    <div class="search-box-container">
+      <h4>Add Stocks </h4>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
+      <div id="suggestions" class="suggestions"></div>
+    </div>
+
     <h2>My Watchlist</h2>
-
-    <!-- Add Stock Button -->
-    <button class="add-btn" onclick="addStock()">Add Stock</button>
-
     <div class="row">
       <% if (watchlist.length > 0) { %>
         <% watchlist.forEach(stock => { %>
@@ -85,7 +38,7 @@
               <div class="card-body">
                 <h5 class="card-title"><%= stock.symbol %></h5>
                 <p class="card-text">Price Today: ₹<%= stock.currentPrice %></p>
-                <p class="card-text">Change: <%= stock.changePercent %> %</p>
+                <p class="card-text">Change: <%= stock.changePercent %> </p>
                 <button class="remove-button" onclick="removeStock('<%= stock.symbol %>')">Remove</button>
               </div>
             </div>
@@ -146,6 +99,69 @@
         alert("Failed to communicate with the server.");
       }
     }
+    const stocks = [
+        
+        { symbol: "ADANIENT", name: "Adani Enterprises" },
+        { symbol: "ADANIPORTS", name: "Adani Ports" },
+        { symbol: "APOLLOHOSP", name: "Apollo Hospitals" },
+        { symbol: "ASIANPAINT", name: "Asian Paints" },
+        { symbol: "AXISBANK", name: "Axis Bank" },
+        { symbol: "BAJAJ-AUTO", name: "Bajaj Auto" },
+        { symbol: "BAJFINANCE", name: "Bajaj Finance" },
+        { symbol: "BAJAJFINSV", name: "Bajaj Finserv" },
+        { symbol: "BPCL", name: "Bharat Petroleum" },
+        { symbol: "BHARTIARTL", name: "Bharti Airtel" },
+        { symbol: "BRITANNIA", name: "Britannia Industries" },
+        { symbol: "CIPLA", name: "Cipla" },
+        { symbol: "COALINDIA", name: "Coal India" },
+        { symbol: "DIVISLAB", name: "Divis Laboratories" },
+        { symbol: "DRREDDY", name: "Dr. Reddy's Laboratories" },
+        { symbol: "EICHERMOT", name: "Eicher Motors" },
+        { symbol: "GRASIM", name: "Grasim Industries" },
+        { symbol: "HCLTECH", name: "HCL Technologies" },
+        { symbol: "HDFCBANK", name: "HDFC Bank" },
+        { symbol: "HDFCLIFE", name: "HDFC Life" },
+        { symbol: "HEROMOTOCO", name: "Hero MotoCorp" },
+        { symbol: "HINDALCO", name: "Hindalco Industries" },
+        { symbol: "HINDUNILVR", name: "Hindustan Unilever" },
+        { symbol: "ICICIBANK", name: "ICICI Bank" },
+        { symbol: "INFY", name: "Infosys" },
+        { symbol: "ITC", name: "ITC Limited" },
+        { symbol: "JSWSTEEL", name: "JSW Steel" },
+        { symbol: "KOTAKBANK", name: "Kotak Mahindra Bank" },
+        { symbol: "LT", name: "Larsen & Toubro" },
+        { symbol: "M&M", name: "Mahindra & Mahindra" },
+        { symbol: "MARUTI", name: "Maruti Suzuki" },
+        { symbol: "NESTLEIND", name: "Nestlé India" },
+        { symbol: "NTPC", name: "NTPC Limited" },
+        { symbol: "RELIANCE", name: "Reliance Industries" },
+        { symbol: "SBIN", name: "State Bank of India" },
+        { symbol: "TATAMOTORS", name: "Tata Motors" },
+        { symbol: "TCS", name: "Tata Consultancy Services" },
+        { symbol: "TECHM", name: "Tech Mahindra" },
+        { symbol: "TITAN", name: "Titan Company" },
+        { symbol: "ULTRACEMCO", name: "UltraTech Cement" }
+    ];
+    function filterStocks() {
+            const input = document.getElementById('searchBox').value.toUpperCase();
+            const suggestions = document.getElementById('suggestions');
+            suggestions.innerHTML = "";
+            if (input.length > 0) {
+                const filteredStocks = stocks.filter(stock =>
+                    stock.name.toUpperCase().includes(input) || stock.symbol.toUpperCase().includes(input)
+                );
+                filteredStocks.forEach(stock => {
+                    const suggestionDiv = document.createElement('div');
+                    suggestionDiv.textContent = `${stock.name} (${stock.symbol})`;
+                    suggestionDiv.addEventListener('click', () => 
+                    window.location.href = `/stock/${stock.symbol}`);
+                    suggestions.appendChild(suggestionDiv);
+                });
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        }
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

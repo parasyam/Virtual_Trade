@@ -3,14 +3,14 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const path = require("path");
 const User = require("../models/user");
-const { setUser, getUser } = require('../service/auth');
+const { setUser, getUser,removeUser } = require('../service/auth');
 require("dotenv").config();
 
-// const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
-// const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
+const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
+const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
 
-const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
-const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
+// const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
+// const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
 
 async function handleUserSignup(req, res) {
     const { name, email, password } = req.body;
@@ -46,6 +46,18 @@ async function handleUserLogin(req, res) {
     return res.redirect("/");
 }
 
+
+async function handleUserLogout(req, res) {
+    const sessionId = req.cookies.uid;
+
+    if (sessionId) {
+        
+        removeUser(sessionId);
+       
+        res.clearCookie('uid');
+    }
+    return res.redirect('/login');
+}
 
 
 async function handleStockDetails(req, res) {
@@ -415,4 +427,5 @@ module.exports = {
     handleRemoveWatchlist,
     handleAddWatchlist,
     handleDashbord,
+    handleUserLogout,
 };

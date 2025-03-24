@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Investfolio - Stock Search</title>
+  <link rel="stylesheet" href="/styles/whatchlist.css">
+  
+  
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <h1>Investfolio</h1>
+    <div>
+      <a href="/stock/get-watchlist">Watchlist</a>
+      <a href="/stock/leaderboard">Leaderboard</a>
+      <a href="/user/logout">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Search Box -->
+  <div class="search-box-container">
+    <h4>Search Stocks</h4>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
+    <div id="suggestions" class="suggestions"></div>
+  </div>
+
+  <script>
+    const stocks = [
+      { symbol: "ADANIENT", name: "Adani Enterprises" },
+      { symbol: "ADANIPORTS", name: "Adani Ports" },
+      { symbol: "APOLLOHOSP", name: "Apollo Hospitals" },
+      { symbol: "ASIANPAINT", name: "Asian Paints" },
+      { symbol: "AXISBANK", name: "Axis Bank" },
+      { symbol: "BAJAJ-AUTO", name: "Bajaj Auto" },
+      { symbol: "BAJFINANCE", name: "Bajaj Finance" },
+      { symbol: "BAJAJFINSV", name: "Bajaj Finserv" },
+      { symbol: "BPCL", name: "Bharat Petroleum" },
+      { symbol: "BHARTIARTL", name: "Bharti Airtel" },
+      { symbol: "BRITANNIA", name: "Britannia Industries" },
+      { symbol: "CIPLA", name: "Cipla" },
+      { symbol: "COALINDIA", name: "Coal India" },
+      { symbol: "DIVISLAB", name: "Divis Laboratories" },
+      { symbol: "DRREDDY", name: "Dr. Reddy's Laboratories" },
+      { symbol: "EICHERMOT", name: "Eicher Motors" },
+      { symbol: "GRASIM", name: "Grasim Industries" },
+      { symbol: "HCLTECH", name: "HCL Technologies" },
+      { symbol: "HDFCBANK", name: "HDFC Bank" },
+      { symbol: "HDFCLIFE", name: "HDFC Life" },
+      { symbol: "HEROMOTOCO", name: "Hero MotoCorp" },
+      { symbol: "HINDALCO", name: "Hindalco Industries" },
+      { symbol: "HINDUNILVR", name: "Hindustan Unilever" },
+      { symbol: "ICICIBANK", name: "ICICI Bank" },
+      { symbol: "INFY", name: "Infosys" },
+      { symbol: "ITC", name: "ITC Limited" },
+      { symbol: "JSWSTEEL", name: "JSW Steel" },
+      { symbol: "KOTAKBANK", name: "Kotak Mahindra Bank" },
+      { symbol: "LT", name: "Larsen & Toubro" },
+      { symbol: "M&M", name: "Mahindra & Mahindra" },
+      { symbol: "MARUTI", name: "Maruti Suzuki" },
+      { symbol: "NESTLEIND", name: "Nestlé India" },
+      { symbol: "NTPC", name: "NTPC Limited" },
+      { symbol: "RELIANCE", name: "Reliance Industries" },
+      { symbol: "SBIN", name: "State Bank of India" },
+      { symbol: "TATAMOTORS", name: "Tata Motors" },
+      { symbol: "TCS", name: "Tata Consultancy Services" },
+      { symbol: "TECHM", name: "Tech Mahindra" },
+      { symbol: "TITAN", name: "Titan Company" },
+      { symbol: "ULTRACEMCO", name: "UltraTech Cement" }
+    ];
+
+    function filterStocks() {
+      const input = document.getElementById('searchBox').value.toUpperCase();
+      const suggestions = document.getElementById('suggestions');
+      suggestions.innerHTML = "";
+
+      if (input.length > 0) {
+        const filteredStocks = stocks.filter(stock =>
+          stock.name.toUpperCase().includes(input) || stock.symbol.toUpperCase().includes(input)
+        );
+
+        filteredStocks.forEach(stock => {
+          const suggestionDiv = document.createElement('div');
+          suggestionDiv.textContent = `${stock.name} (${stock.symbol})`;
+          suggestionDiv.addEventListener('click', () => {
+            window.location.href = `/stock/${stock.symbol}`;
+          });
+          suggestions.appendChild(suggestionDiv);
+        });
+
+        suggestions.style.display = 'block';
+      } else {
+        suggestions.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>

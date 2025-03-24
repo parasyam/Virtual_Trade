@@ -1,0 +1,178 @@
+/* Global Styles - Dark Theme */
+body {
+    background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+}
+nav {
+    background-color: #111;
+    padding: 20px;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+  }
+  
+  nav h1 {
+    font-size: 28px;
+    color: #00ff99;
+  }
+  
+  nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 600;
+    transition: color 0.3s;
+  }
+  
+  nav a:hover {
+    color: #00ff99;
+  }
+
+
+
+h2 {
+    color: #00cc88;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.add-btn {
+    background-color: #00cc88;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+    background-color: #00b377;
+}
+
+/* Card Styling */
+.card {
+    background-color: #181818;
+    border: none;
+    border-radius: 15px;
+    color: #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.card-title {
+    color: #00cc88;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 16px;
+}
+
+/* Remove Button Styling */
+.remove-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+    background-color: #c82333;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .add-btn {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+/* ======= Search Box Updated for Dark ======= */
+.search-box-container {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 10px;
+    margin-top: 30px;
+    position: relative;
+    width: fit-content;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    width: 350px;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 25px;
+    border: 2px solid #00cc88;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-box:focus {
+    border-color: #00b377;
+    box-shadow: 0 0 8px rgba(0, 204, 136, 0.4);
+}
+
+/* Search Button Styling */
+.search-button {
+    background-color: #00cc88;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #00b377;
+}
+
+/* Suggestions Box - Dark Theme */
+.suggestions {
+    position: absolute;
+    top: 60px;  /* Adjust based on the search box height */
+    left: 0;
+    background-color: #1e1e1e;  /* Dark background */
+    width: 350px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+}
+
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+    color: #e0e0e0;
+}
+
+.suggestions div:hover {
+    background-color: #034d34;
+    color: #fff;
+}

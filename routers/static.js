@@ -12,5 +12,9 @@ router.get('/login',(req,res)=>{
     return res.render('login',{ error: null });
 });
 
+router.get('/stock-search',(req,res)=>{
+    
+    return res.render('stock-search',{ error: null });
+});
 
 module.exports=router;

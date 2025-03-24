@@ -1,0 +1,305 @@
+/* Global Styles - Enhanced Dark Theme */
+body {
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  background-color: #111;
+  padding: 10px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav h1 {
+  font-size: 28px;
+  color: #00ff99;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #00ff99;
+}
+
+h2, h3, h4 {
+  color: #00cc88;
+  font-weight: 400;
+}
+
+/* Content Layout */
+#content {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 30px 5%;
+  flex-wrap: wrap;
+}
+
+#div0, #stock-details {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 15px;
+  color: #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  flex: 1 1 320px;
+}
+
+#div0 h4 {
+  color: #00ff99;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+/* Stock Details Grid */
+#stock-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* 3 columns */
+  gap: 20px;
+}
+
+.detail-item {
+  background-color: #2a2a2a;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.detail-item strong {
+  color: #00ff99;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+/* Portfolio Overview */
+.portfolio-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.overview-item {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 15px;
+  min-width: 250px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s;
+}
+
+.overview-item:hover {
+  transform: scale(1.05);
+}
+
+.profit {
+  color: #28a745;
+  border-left: 6px solid #28a745;
+}
+
+.loss {
+  color: #dc3545;
+  border-left: 6px solid #dc3545;
+}
+
+/* Cards */
+.card {
+  background-color: #222;
+  border-radius: 15px;
+  padding: 20px;
+  color: #e0e0e0;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.7);
+}
+
+.card-title {
+  color: #00cc88;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Footer */
+footer {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  padding: 30px 5%;
+  text-align: center;
+  margin-top: 50px;
+  border-top: 1px solid #333;
+}
+
+/* Search Box + Buttons Container */
+.search-and-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.search-container {
+  position: relative;
+  flex: 1 1 300px;
+  max-width: 450px;
+}
+
+#searchBox {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 2px solid #00cc88;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#searchBox:focus {
+  border-color: #00b377;
+  box-shadow: 0 0 10px rgba(0, 204, 136, 0.5);
+}
+
+.suggestions {
+  position: absolute;
+  top: 65px;
+  left: 0;
+  background-color: #1e1e1e;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #333;
+  border-radius: 10px;
+  display: none;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.suggestions div {
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+  color: #e0e0e0;
+  border-bottom: 1px solid #333;
+}
+
+.suggestions div:hover {
+  background-color: #034d34;
+  color: #fff;
+}
+
+/* Buttons beside Search */
+.search-and-buttons button {
+  background-color: #00cc88;
+  color: #121212;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.3s, transform 0.2s;
+  min-width: 120px;
+}
+
+.search-and-buttons button:hover {
+  background-color: #00b377;
+  transform: translateY(-3px);
+}
+
+.heading {
+  font-weight: 500;
+  font-size: 32px;
+  color: #00cc88;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  nav h1 {
+    font-size: 24px;
+  }
+
+  .heading {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #content {
+    flex-direction: column;
+    padding: 20px 5%;
+  }
+
+  .portfolio-overview {
+    justify-content: center;
+  }
+
+  #stock-details {
+    grid-template-columns: 1fr;
+  }
+
+  .search-and-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #searchBox {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  nav a {
+    margin-left: 10px;
+    font-size: 14px;
+  }
+
+  .detail-item {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .overview-item {
+    min-width: 90%;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+}

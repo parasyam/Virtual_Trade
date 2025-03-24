@@ -1,483 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InvestGo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <style>
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: white;
-        }
-
-        nav img {
-            height: 10vh;
-        }
-
-        #content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            padding: 20px;
-        }
-
-        #div0, #div1, #div2 {
-            padding: 15px;
-            margin: 10px;
-            flex: 1 1 30%;
-            min-width: 250px;
-        }
-
-        #div0 {
-            background-color: #e6f1e4;
-            border: 1px solid #000;
-        }
-
-        #but {
-            margin-top: 20px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            background-color: rgb(149, 236, 149);
-            cursor: pointer;
-        }
-
-        #result {
-            border: 2px solid #000;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 1200px) {
-            #div0, #div1, #div2 {
-                flex: 1 1 45%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #div0, #div1, #div2 {
-                flex: 1 1 100%;
-            }
-        }
-
-        #open {
-            display: none;
-        }
-
-        #open i {
-            background-color: rgb(186, 245, 127);
-            font-size: 30px;
-            padding: 3px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .navbar-nav .nav-item .nav-link {
-            font-size: 16px;
-        }
-
-        .navbar-toggler-icon {
-            background-color: #000;
-        }
-        .sidebar {
-                width: 250px;
-                background-color: #2c3e50;
-                color: white;
-                height: 100vh;
-                padding: 20px;
-                position: fixed;
-                left: 0;
-            }
-            .sidebar h2 {
-                font-size: 24px;
-                margin-bottom: 30px;
-                text-align: center;
-            }
-            .sidebar a {
-            display: block;
-            padding: 12px;
-            color: white;
-            text-decoration: none;
-            margin: 8px 0;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        #quantityPopup {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 1000; /* Ensure it's on top */
-        }
-        
-        .popup-content {
-        background: white;
-        padding: 20px; 
-        border-radius: 10px;
-        text-align: center;
-        }
-        .sidebar a:hover {
-            background-color: #34495e;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-            flex: 1;
-            position: relative;
-        }
-        .main-header {
-            background-color: #2980b9;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        .add-to-portfolio-btn {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background-color: #16a085;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        .add-to-portfolio-btn:hover {
-            background-color: #1abc9c;
-        }
-        .stock-card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 800px;
-            margin: auto;
-        }
-        .stock-info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stock-info-grid .stock-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-        }
-        .stock-info-grid .label {
-            font-weight: 500;
-            color: #34495e;
-        }
-        .stock-info-grid .value {
-            color: #16a085;
-        }
-        .search-box {
-            width: 300px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 25px;
-            border: 1px solid #ddd;
-            margin-bottom: 30px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .search-box:focus {
-            border-color: #2980b9;
-        }
-        .suggestions {
-            position: absolute;
-            background-color: white;
-            width: 300px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            display: none;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-        .suggestions div {
-            padding: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .suggestions div:hover {
-            background-color: #2980b9;
-            color: white;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-            .main-content {
-                margin-left: 200px;
-            }
-            .search-box {
-                width: 250px;
-            }
-            .stock-info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-    .add-to-watchlist-btn {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-        
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvestGo - Stock Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/stock-data.css">
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-     
-        <a class="navbar-brand" href="#"><img src="/logo-removebg-preview.png" alt="Logo"></a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="../index.html">Home</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Investing Calculators
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="../fixed deposit/fd.html">FD Calculator</a></li>
-              <li><a class="dropdown-item" href="../mutual funds/mutual.html">Mutual Funds Calculator</a></li>
-              <li><a class="dropdown-item" href="../sip/sip.html">SIP Calculator</a></li>
-              <li><a class="dropdown-item" href="../ppf/ppf.html">PPF Calculator</a></li>
-              <li><a class="dropdown-item" href="./nps.html">Pension Calculator</a></li>
-              <li><a class="dropdown-item" href="../fd Vs m/fdvsm.html">FD Vs Mutual Calculator</a></li>
-              <li><a class="dropdown-item" href="../sipvsswp/sipvsswp.html">SIP to SWP Calculator</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+<body>
+  <nav>
+    <h1>Investfolio</h1>
+    <div>
+      <a href="/stock/get-watchlist">Watchlist</a>
+      <a href="/stock/leaderboard">Leaderboard</a>
+      <a href="/user/logout">Logout</a>
     </div>
   </nav>
+  <div class="search-and-buttons">
+    <!-- <div class="search-box-container">
+      
+      <input type="text" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
+      <div id="suggestions"></div>
 
-  <div class="search-box-container">
-    <h7>Search </h7>
-    <input type="text" class="search-box" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
-    <div id="suggestions" class="suggestions"></div>
-</div>
-<div id="quantityPopup">
-  <div class="popup-content">
-      <h3>Enter Quantity</h3>
-      <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
-      <button id="confirmQuantity">Confirm</button>
+      
+    </div> -->
+
+    <div class="search-and-buttons">
+      <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+    </div>
+    
+  
+    <div class="buttons">
+      <button id="addToportfolioBtn" data-stock='{"symbol": "<%= symbol %>", "stockPrice": <%= stockPrice %>}'>Add to Portfolio</button>
+      <button id="addToWatchlistBtn" data-stock='{"symbol": "<%= symbol %>"}'>Add to Watchlist</button>
+    </div>
+  </div>
+
+ <div id="content">
+  <div id="div0">
+    <h4><%= symbol %></h4>
+    <p><%= stockAbout %></p>
+  </div>
+
+  <div id="stock-details">
+    <h2 style="grid-column: 1 / -1;">Stock Details</h2>
+
+    <div class="detail-item"><strong>Symbol</strong> <%= symbol %></div>
+    <div class="detail-item"><strong>Stock Price</strong> ₹<%= stockPrice %></div>
+    <div class="detail-item"><strong>Industry</strong> <%= industry %></div>
+
+    <div class="detail-item"><strong>Change %</strong> <%= changePercent %>%</div>
+    <div class="detail-item"><strong>Market Cap</strong> ₹<%= marketCap %></div>
+    <div class="detail-item"><strong>P/E Ratio</strong> <%= peRatio %></div>
+
+    <div class="detail-item"><strong>52W Low</strong> ₹<%= yearLow %></div>
+    <div class="detail-item"><strong>52W High</strong> ₹<%= yearHigh %></div>
+    <div class="detail-item"><strong>Dividend</strong> ₹<%= dividend %></div>
   </div>
 </div>
-  <div id="content">
-    <div id="open">
-      <i class="ri-arrow-right-fill"></i>
-    </div>
-    <div id="div0">
-      <i id="closing" class="ri-arrow-left-fill"></i>
-      <h4><%= symbol %></h4>
-      <br>
-      <p><%=stockAbout %>      </p>
-    </div>
-    <div id="div1">
-      <h2>Stock Details</h2>
-      <p><strong>Symbol:</strong> <%= symbol %></p>
-      <p><strong>Stock Price:</strong> <%= stockPrice %></p>
-      <p><strong>Industry:</strong> <%=industry %></p>
-      <p><strong>Change Percent:</strong> <%= changePercent %>%</p>
-      <p><strong>Market Cap:</strong> <%= marketCap %></p>
-      <p><strong>P/E Ratio:</strong> <%= peRatio %></p>
-      <p><strong>52 Week Low:</strong> <%= yearLow %></p>
-      <p><strong>52 Week High:</strong> <%= yearHigh %></p>
-      <p><strong>dividend:</strong> <%=  dividend%></p>
-  </div>
-    <div id="div2">
-      <canvas id="fdchart" width="400" height="400"></canvas>
-    </div>
-  </div>
-  <button id="addToportfolioBtn" class="add-to-portfolio-btn" 
-  data-stock='{"symbol": "<%= symbol %>", "stockPrice": <%= stockPrice %>}'>
-  Add to portfolio
-</button>
-
-<button id="addToWatchlistBtn" class="add-to-watchlist-btn" 
-  data-stock='{"symbol": "<%= symbol %>"}'>
-  Add to Watchlist
-</button>
 
 
-  <div id="result"></div>
+  
 
   <script>
     const stocks = [
-        
-        { symbol: "ADANIENT", name: "Adani Enterprises" },
-        { symbol: "ADANIPORTS", name: "Adani Ports" },
-        { symbol: "APOLLOHOSP", name: "Apollo Hospitals" },
-        { symbol: "ASIANPAINT", name: "Asian Paints" },
-        { symbol: "AXISBANK", name: "Axis Bank" },
-        { symbol: "BAJAJ-AUTO", name: "Bajaj Auto" },
-        { symbol: "BAJFINANCE", name: "Bajaj Finance" },
-        { symbol: "BAJAJFINSV", name: "Bajaj Finserv" },
-        { symbol: "BPCL", name: "Bharat Petroleum" },
-        { symbol: "BHARTIARTL", name: "Bharti Airtel" },
-        { symbol: "BRITANNIA", name: "Britannia Industries" },
-        { symbol: "CIPLA", name: "Cipla" },
-        { symbol: "COALINDIA", name: "Coal India" },
-        { symbol: "DIVISLAB", name: "Divis Laboratories" },
-        { symbol: "DRREDDY", name: "Dr. Reddy's Laboratories" },
-        { symbol: "EICHERMOT", name: "Eicher Motors" },
-        { symbol: "GRASIM", name: "Grasim Industries" },
-        { symbol: "HCLTECH", name: "HCL Technologies" },
-        { symbol: "HDFCBANK", name: "HDFC Bank" },
-        { symbol: "HDFCLIFE", name: "HDFC Life" },
-        { symbol: "HEROMOTOCO", name: "Hero MotoCorp" },
-        { symbol: "HINDALCO", name: "Hindalco Industries" },
-        { symbol: "HINDUNILVR", name: "Hindustan Unilever" },
-        { symbol: "ICICIBANK", name: "ICICI Bank" },
-        { symbol: "INFY", name: "Infosys" },
-        { symbol: "ITC", name: "ITC Limited" },
-        { symbol: "JSWSTEEL", name: "JSW Steel" },
-        { symbol: "KOTAKBANK", name: "Kotak Mahindra Bank" },
-        { symbol: "LT", name: "Larsen & Toubro" },
-        { symbol: "M&M", name: "Mahindra & Mahindra" },
-        { symbol: "MARUTI", name: "Maruti Suzuki" },
-        { symbol: "NESTLEIND", name: "Nestlé India" },
-        { symbol: "NTPC", name: "NTPC Limited" },
-        { symbol: "RELIANCE", name: "Reliance Industries" },
-        { symbol: "SBIN", name: "State Bank of India" },
-        { symbol: "TATAMOTORS", name: "Tata Motors" },
-        { symbol: "TCS", name: "Tata Consultancy Services" },
-        { symbol: "TECHM", name: "Tech Mahindra" },
-        { symbol: "TITAN", name: "Titan Company" },
-        { symbol: "ULTRACEMCO", name: "UltraTech Cement" }
+      { symbol: "ADANIENT", name: "Adani Enterprises" },
+      { symbol: "RELIANCE", name: "Reliance Industries" },
+      { symbol: "TCS", name: "Tata Consultancy Services" },
+      { symbol: "INFY", name: "Infosys" },
+      { symbol: "HDFCBANK", name: "HDFC Bank" },
+      { symbol: "ITC", name: "ITC Limited" },
     ];
+
     function filterStocks() {
-            const input = document.getElementById('searchBox').value.toUpperCase();
-            const suggestions = document.getElementById('suggestions');
-            suggestions.innerHTML = "";
-            if (input.length > 0) {
-                const filteredStocks = stocks.filter(stock =>
-                    stock.name.toUpperCase().includes(input) || stock.symbol.toUpperCase().includes(input)
-                );
-                filteredStocks.forEach(stock => {
-                    const suggestionDiv = document.createElement('div');
-                    suggestionDiv.textContent = `${stock.name} (${stock.symbol})`;
-                    suggestionDiv.addEventListener('click', () => 
-                    window.location.href = `/stock/${stock.symbol}`);
-                    suggestions.appendChild(suggestionDiv);
-                });
-                suggestions.style.display = 'block';
-            } else {
-                suggestions.style.display = 'none';
-            }
-        }
+      const input = document.getElementById('searchBox').value.toUpperCase();
+      const suggestions = document.getElementById('suggestions');
+      suggestions.innerHTML = "";
+      if (input.length > 0) {
+        const filteredStocks = stocks.filter(stock =>
+          stock.name.toUpperCase().includes(input) || stock.symbol.toUpperCase().includes(input)
+        );
+        filteredStocks.forEach(stock => {
+          const suggestionDiv = document.createElement('div');
+          suggestionDiv.textContent = `${stock.name} (${stock.symbol})`;
+          suggestionDiv.onclick = () => window.location.href = `/stock/${stock.symbol}`;
+          suggestions.appendChild(suggestionDiv);
+        });
+        suggestions.style.display = 'block';
+      } else {
+        suggestions.style.display = 'none';
+      }
+    }
 
-     document.getElementById("addToportfolioBtn").addEventListener("click", function () {
-         console.log("watch click");
-    const stockData = JSON.parse(this.getAttribute("data-stock"));
-    const stockName = stockData.symbol;
-    const stockPrice = stockData.stockPrice;
-
-    // Show the quantity input popup
-    const quantityPopup = document.getElementById("quantityPopup");
-    quantityPopup.style.display = "block";
-
-    // Handle submit action
-    document.getElementById("confirmQuantity").onclick = function () {
-        const quantity = document.getElementById("quantityInput").value;
-
-        if (!quantity || isNaN(quantity) || quantity <= 0) {
-            alert("Please enter a valid quantity!");
-            return;
-        }
-
-        fetch("/stock/AddPortfolio", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stockName, stockPrice, quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            quantityPopup.style.display = "none"; 
-        })
-        .catch(error => console.error("Error:", error));
+    document.getElementById("addToportfolioBtn").onclick = function () {
+      const stockData = JSON.parse(this.getAttribute('data-stock'));
+      let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
+      portfolio.push(stockData);
+      localStorage.setItem('portfolio', JSON.stringify(portfolio));
+      alert(`${stockData.symbol} added to Portfolio`);
     };
-});
 
-
-document.getElementById("addToWatchlistBtn").addEventListener("click", function () {
-      console.log("Watchlist click");
-      const stockData = JSON.parse(this.getAttribute("data-stock"));
-      const stockName = stockData.symbol;
-
-      // API call to add the stock to watchlist
-      fetch("/stock/add-watchlist", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stockSymbol: stockName })
-        })
-      .then(response => response.json())
-      .then(data => {
-          alert(data.message);  // Show success or error
-      })
-      .catch(error => console.error("Error adding to watchlist:", error));
-  });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        var ctx = document.getElementById('fdchart').getContext('2d');
-
-        document.getElementById("but")?.addEventListener("click", function(){
-            document.getElementById("result").style.display = "block";
-        });
-
-        document.getElementById("closing")?.addEventListener("click", function(){
-            document.getElementById("div0").style.display = "none";
-            document.getElementById("open").style.display = "block";
-        });
-
-        document.getElementById("open")?.addEventListener("click", function(){
-            document.getElementById("div0").style.display = "block";
-            document.getElementById("open").style.display = "none";
-        });
-
-      });
-
-
+    document.getElementById("addToWatchlistBtn").onclick = function () {
+      const stockData = JSON.parse(this.getAttribute('data-stock'));
+      let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+      watchlist.push(stockData);
+      localStorage.setItem('watchlist', JSON.stringify(watchlist));
+      alert(`${stockData.symbol} added to Watchlist`);
+    };
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

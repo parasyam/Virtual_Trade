@@ -3,6 +3,7 @@ const app = express();
 const port = 8000;
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const path = require('path');
 
 const userRoute = require('./routers/user.js');
 const staticRoute = require('./routers/static.js');
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/user', userRoute);

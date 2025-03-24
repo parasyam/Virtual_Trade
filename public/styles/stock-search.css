@@ -1,0 +1,113 @@
+/* ======= Body and General Styles ======= */
+body {
+    background-color: #121212;  /* Dark background */
+    color: #e0e0e0;  /* Light text */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ======= Navbar Styling ======= */
+nav {
+    background-color: #111;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h1 {
+    font-size: 28px;
+    color: #00ff99;
+}
+
+nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #00ff99;
+}
+
+/* ======= Heading Styling ======= */
+h2 {
+    color: #00cc88;
+    font-weight: 700;
+}
+
+/* ======= Search Box Styling ======= */
+.search-box-container {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 10px;
+    margin-top: 30px;
+    position: relative;
+    width: fit-content;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    width: 350px;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 25px;
+    border: 2px solid #00cc88;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-box:focus {
+    border-color: #00b377;
+    box-shadow: 0 0 8px rgba(0, 204, 136, 0.4);
+}
+
+/* ======= Search Button Styling ======= */
+.search-button {
+    background-color: #00cc88;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #00b377;
+}
+
+/* ======= Suggestions Box - Dark Theme ======= */
+.suggestions {
+    position: absolute;
+    top: 60px;  /* Adjust based on the search box height */
+    left: 0;
+    background-color: #1e1e1e;  /* Dark background */
+    width: 350px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+}
+
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+    color: #e0e0e0;
+}
+
+.suggestions div:hover {
+    background-color: #034d34;
+    color: #fff;
+}
