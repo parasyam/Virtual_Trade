@@ -75,40 +75,40 @@ async function handleStockDetails(req, res) {
     const symbol = `${sym}:NSE`;
 
     try {
-        // 1. Fetch stock overview data
-        const stockResponse = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
-            params: { symbol, language: "en" },
-            headers: {
-                "x-rapidapi-host": RAPIDAPI_HOST,
-                "x-rapidapi-key": RAPIDAPI_KEY,
-            },
-        });
+        // ✅ Parallel API calls with Promise.all() and timeout added
+        const [stockResponse, incomeResponse] = await Promise.all([
+            axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
+                params: { symbol, language: "en" },
+                headers: {
+                    "x-rapidapi-host": RAPIDAPI_HOST,
+                    "x-rapidapi-key": RAPIDAPI_KEY,
+                },
+                timeout: 5000 // ✅ Added timeout to avoid waiting too long
+            }),
+            axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
+                params: { symbol, period: "QUARTERLY", language: "en" },
+                headers: {
+                    "x-rapidapi-host": RAPIDAPI_HOST,
+                    "x-rapidapi-key": RAPIDAPI_KEY,
+                },
+                timeout: 5000 // ✅ Added timeout here as well
+            })
+        ]);
 
         const stockData = stockResponse.data;
-
-        // 2. Fetch income statement data (QUARTERLY)
-        const incomeResponse = await axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
-            params: { symbol, period: "QUARTERLY", language: "en" },
-            headers: {
-                "x-rapidapi-host": RAPIDAPI_HOST,
-                "x-rapidapi-key": RAPIDAPI_KEY,
-            },
-        });
-        
         const incomeData = incomeResponse.data?.data?.income_statement || [];
 
-        // Get past 4 quarters
-       const pastFourQuarters = incomeData.slice(0, 4).map((quarter) => ({
-    period: quarter?.date || 'N/A',
-    revenue: quarter?.revenue ? (quarter.revenue / 10000000).toFixed(2) : 0,          // Convert to Cr
-    netIncome: quarter?.net_income ? (quarter.net_income / 10000000).toFixed(2) : 0,  // Convert to Cr
-    eps: quarter?.earnings_per_share || 0,                                            // EPS is already per share
-    netProfitMargin: quarter?.net_profit_margin || 0,
-    EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0              // Convert to Cr
-}));
+        // ✅ Process the latest 4 quarters
+        const pastFourQuarters = incomeData.slice(0, 4).map((quarter) => ({
+            period: quarter?.date || 'N/A',
+            revenue: quarter?.revenue ? (quarter.revenue / 10000000).toFixed(2) : 0,         // Convert to Cr
+            netIncome: quarter?.net_income ? (quarter.net_income / 10000000).toFixed(2) : 0, // Convert to Cr
+            eps: quarter?.earnings_per_share || 0,
+            netProfitMargin: quarter?.net_profit_margin || 0,
+            EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0              // Convert to Cr
+        }));
 
-
-        // Render page with stock and 4 quarters of income data
+        // ✅ Render with stock and income data
         if (stockData?.data?.price) {
             return res.render("stock_data", {
                 symbol: sym,
@@ -139,7 +139,10 @@ async function handleStockDetails(req, res) {
             });
         }
     } catch (error) {
-        console.error("Error fetching stock or income statement data:", error.response?.data || error.message);
+        // ✅ Improved error log with optional chaining
+        console.error("Error fetching stock or income data:", error.response?.data || error.message);
+
+        // ✅ Render fallback view on error
         return res.render("stock_data", {
             symbol: sym,
             stockPrice: 0,
@@ -208,7 +211,6 @@ async function handleAddPortfolio(req, res) {
     }
 }
 
-
 async function handlePortfolio(req, res) {
     if (!req.user) {
         return res.redirect("/login");
@@ -218,10 +220,10 @@ async function handlePortfolio(req, res) {
         const user = await User.findById(req.user._id);
         let totalInvestment = 0;
         let presentValue = 0;
-        let stocksData = [];
         let apiFailed = false;
 
-        for (let stock of user.favoriteStocks) {
+        // ✅ Parallel API calls using Promise.all()
+        const stockPromises = user.favoriteStocks.map(async (stock) => {
             let currentPrice = 0;
             try {
                 const response = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
@@ -231,7 +233,6 @@ async function handlePortfolio(req, res) {
                         "x-rapidapi-key": RAPIDAPI_KEY,
                     },
                 });
-
                 const stockData = response.data;
                 currentPrice = stockData?.data?.price || 0;
             } catch (error) {
@@ -239,27 +240,27 @@ async function handlePortfolio(req, res) {
                 apiFailed = true;
             }
 
-            stocksData.push({
+            return {
                 symbol: stock.name,
                 quantity: stock.quantity,
                 pastPrice: stock.price,
                 currentPrice: currentPrice,
-            });
+            };
+        });
 
-            presentValue += stock.quantity * currentPrice;
-            totalInvestment += stock.quantity * stock.price;
-        }
+        const stocksData = await Promise.all(stockPromises);
 
-        // If API failed due to limit or other reason, send 0 values
-        if (apiFailed) {
+        // ✅ Calculate totalInvestment and presentValue
+        if (!apiFailed) {
+            for (let stock of stocksData) {
+                presentValue += stock.quantity * stock.currentPrice;
+                totalInvestment += stock.quantity * stock.pastPrice;
+            }
+        } else {
+            // Fallback if API fails
             presentValue = 0;
             totalInvestment = 0;
-            stocksData = user.favoriteStocks.map(stock => ({
-                symbol: stock.name,
-                quantity: stock.quantity,
-                pastPrice: stock.price,
-                currentPrice: 0
-            }));
+            stocksData.forEach(stock => stock.currentPrice = 0);
         }
 
         return res.render("portfolio", {
@@ -267,7 +268,7 @@ async function handlePortfolio(req, res) {
             presentValue,
             totalInvestment,
             realizedProfit: user.realizedProfit || 0,
-            AvaliableFunds:user.funds,
+            AvaliableFunds: user.funds,
         });
     } catch (error) {
         console.error("Error fetching portfolio:", error.message);
