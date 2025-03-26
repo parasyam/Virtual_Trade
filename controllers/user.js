@@ -6,11 +6,11 @@ const User = require("../models/user");
 const { setUser, getUser,removeUser } = require('../service/auth');
 require("dotenv").config();
 
-const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
-const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
+// const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
+// const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
 
-// const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
-// const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
+const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
+const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
 
 async function handleUserSignup(req, res) {
     const { name, email, password } = req.body;
@@ -69,7 +69,8 @@ async function handleStockDetails(req, res) {
     const symbol = `${sym}:NSE`;
 
     try {
-        const response = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
+        // 1. Fetch stock overview data
+        const stockResponse = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
             params: { symbol, language: "en" },
             headers: {
                 "x-rapidapi-host": RAPIDAPI_HOST,
@@ -77,8 +78,31 @@ async function handleStockDetails(req, res) {
             },
         });
 
-        const stockData = response.data;
+        const stockData = stockResponse.data;
 
+        // 2. Fetch income statement data (QUARTERLY)
+        const incomeResponse = await axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
+            params: { symbol, period: "QUARTERLY", language: "en" },
+            headers: {
+                "x-rapidapi-host": RAPIDAPI_HOST,
+                "x-rapidapi-key": RAPIDAPI_KEY,
+            },
+        });
+        
+        const incomeData = incomeResponse.data?.data?.income_statement || [];
+
+        // Get past 4 quarters
+       const pastFourQuarters = incomeData.slice(0, 4).map((quarter) => ({
+    period: quarter?.date || 'N/A',
+    revenue: quarter?.revenue ? (quarter.revenue / 10000000).toFixed(2) : 0,          // Convert to Cr
+    netIncome: quarter?.net_income ? (quarter.net_income / 10000000).toFixed(2) : 0,  // Convert to Cr
+    eps: quarter?.earnings_per_share || 0,                                            // EPS is already per share
+    netProfitMargin: quarter?.net_profit_margin || 0,
+    EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0              // Convert to Cr
+}));
+
+
+        // Render page with stock and 4 quarters of income data
         if (stockData?.data?.price) {
             return res.render("stock_data", {
                 symbol: sym,
@@ -90,10 +114,10 @@ async function handleStockDetails(req, res) {
                 yearLow: stockData.data.year_low,
                 yearHigh: stockData.data.year_high,
                 dividend: stockData.data.company_dividend_yield,
-                industry: stockData.data.company_industry
+                industry: stockData.data.company_industry,
+                pastFourQuarters: pastFourQuarters
             });
         } else {
-            // API responded but no data found
             return res.render("stock_data", {
                 symbol: sym,
                 stockPrice: 0,
@@ -104,12 +128,12 @@ async function handleStockDetails(req, res) {
                 yearLow: 0,
                 yearHigh: 0,
                 dividend: 0,
-                industry: "N/A"
+                industry: "N/A",
+                pastFourQuarters: []
             });
         }
     } catch (error) {
-        console.error("Error fetching stock data:", error.response?.data || error.message);
-        // On API failure or limit exceed, send zero/default values
+        console.error("Error fetching stock or income statement data:", error.response?.data || error.message);
         return res.render("stock_data", {
             symbol: sym,
             stockPrice: 0,
@@ -120,10 +144,12 @@ async function handleStockDetails(req, res) {
             yearLow: 0,
             yearHigh: 0,
             dividend: 0,
-            industry: "N/A"
+            industry: "N/A",
+            pastFourQuarters: []
         });
     }
 }
+
 
 async function handleAddPortfolio(req, res) {
     if (!req.user) {

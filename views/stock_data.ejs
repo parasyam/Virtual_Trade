@@ -13,59 +13,101 @@
   <nav>
     <h1>Investfolio</h1>
     <div>
+      <a href="/stock/portfolio">portfolio</a>
       <a href="/stock/get-watchlist">Watchlist</a>
       <a href="/stock/leaderboard">Leaderboard</a>
       <a href="/user/logout">Logout</a>
     </div>
   </nav>
+
   <div class="search-and-buttons">
-    <!-- <div class="search-box-container">
-      
+    <div class="search-container">
       <input type="text" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
-      <div id="suggestions"></div>
-
-      
-    </div> -->
-
-    <div class="search-and-buttons">
-      <div class="search-container">
-        <input type="text" id="searchBox" placeholder="Search for a stock..." oninput="filterStocks()">
-        <div class="suggestions" id="suggestions"></div>
-      </div>
+      <div class="suggestions" id="suggestions"></div>
     </div>
-    
-  
+
     <div class="buttons">
       <button id="addToportfolioBtn" data-stock='{"symbol": "<%= symbol %>", "stockPrice": <%= stockPrice %>}'>Add to Portfolio</button>
       <button id="addToWatchlistBtn" data-stock='{"symbol": "<%= symbol %>"}'>Add to Watchlist</button>
     </div>
-  </div>
+    
+  <div id="content">
+    <div id="div0">
+      <h4><%= symbol %></h4>
+      <p><%= stockAbout %></p>
+    </div>
 
- <div id="content">
-  <div id="div0">
-    <h4><%= symbol %></h4>
-    <p><%= stockAbout %></p>
-  </div>
+    <div id="stock-details">
+      <h2 style="grid-column: 1 / -1;">Stock Details</h2>
 
-  <div id="stock-details">
-    <h2 style="grid-column: 1 / -1;">Stock Details</h2>
+      <div class="detail-item"><strong>Symbol</strong> <%= symbol %></div>
+      <div class="detail-item"><strong>Stock Price</strong> ₹<%= stockPrice %></div>
+      <div class="detail-item"><strong>Industry</strong> <%= industry %></div>
 
-    <div class="detail-item"><strong>Symbol</strong> <%= symbol %></div>
-    <div class="detail-item"><strong>Stock Price</strong> ₹<%= stockPrice %></div>
-    <div class="detail-item"><strong>Industry</strong> <%= industry %></div>
+      <div class="detail-item"><strong>Change %</strong> <%= changePercent %>%</div>
+      <div class="detail-item"><strong>Market Cap</strong> ₹<%= marketCap %></div>
+      <div class="detail-item"><strong>P/E Ratio</strong> <%= peRatio %></div>
 
-    <div class="detail-item"><strong>Change %</strong> <%= changePercent %>%</div>
-    <div class="detail-item"><strong>Market Cap</strong> ₹<%= marketCap %></div>
-    <div class="detail-item"><strong>P/E Ratio</strong> <%= peRatio %></div>
+      <div class="detail-item"><strong>52W Low</strong> ₹<%= yearLow %></div>
+      <div class="detail-item"><strong>52W High</strong> ₹<%= yearHigh %></div>
+      <div class="detail-item"><strong>Dividend</strong> ₹<%= dividend %></div>
+    </div>
 
-    <div class="detail-item"><strong>52W Low</strong> ₹<%= yearLow %></div>
-    <div class="detail-item"><strong>52W High</strong> ₹<%= yearHigh %></div>
-    <div class="detail-item"><strong>Dividend</strong> ₹<%= dividend %></div>
-  </div>
-</div>
+    <!-- Past 4 Quarters Income Section -->
+    <div id="past-income">
+      <h2>Past 4 Quarters Income</h2>
+    
+      <% if (pastFourQuarters && pastFourQuarters.length > 0) { %>
+        <table border="1">
+          <tr>
+            <th>Quarter</th>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <th><%= quarter.period %></th>
+            <% }); %>
+          </tr>
+        
+          <tr>
+            <td>Revenue (Cr)</td>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <td><%= quarter.revenue %> Cr</td>
+            <% }); %>
+          </tr>
+        
+          <tr>
+            <td>Net Profit Margin (%)</td>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <td><%= quarter.netProfitMargin %> %</td>
+            <% }); %>
+          </tr>
+        
+          <tr>
+            <td>Net Income (Cr)</td>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <td><%= quarter.netIncome %> Cr</td>
+            <% }); %>
+          </tr>
+        
+          <tr>
+            <td>EPS</td>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <td><%= quarter.eps %></td>
+            <% }); %>
+          </tr>
+        
+          <tr>
+            <td>EBITDA (Cr)</td>
+            <% pastFourQuarters.forEach(quarter => { %>
+              <td><%= quarter.EBITDA %> Cr</td>
+            <% }); %>
+          </tr>
+        </table>
+        
+      <% } else { %>
+        <p>No past income data available.</p>
+      <% } %>
+    </div>
 
-
-  
+    
 
   <script>
     const stocks = [
@@ -97,21 +139,57 @@
       }
     }
 
+    
     document.getElementById("addToportfolioBtn").onclick = function () {
-      const stockData = JSON.parse(this.getAttribute('data-stock'));
-      let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
-      portfolio.push(stockData);
-      localStorage.setItem('portfolio', JSON.stringify(portfolio));
-      alert(`${stockData.symbol} added to Portfolio`);
-    };
+    const stockData = JSON.parse(this.getAttribute('data-stock'));
+    const quantity = prompt(`Enter quantity for ${stockData.symbol}:`);
 
-    document.getElementById("addToWatchlistBtn").onclick = function () {
-      const stockData = JSON.parse(this.getAttribute('data-stock'));
-      let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
-      watchlist.push(stockData);
-      localStorage.setItem('watchlist', JSON.stringify(watchlist));
-      alert(`${stockData.symbol} added to Watchlist`);
-    };
+    // Check if quantity is valid
+    if (quantity === null || isNaN(quantity) || quantity <= 0) {
+      alert("Invalid quantity!");
+      return;
+    }
+
+    stockData.quantity = parseInt(quantity);
+    
+    let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
+    portfolio.push(stockData);
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+
+    alert(`${stockData.symbol} (Quantity: ${stockData.quantity}) added to Portfolio`);
+    
+    //OPTIONAL: If you want to send this data to your Node.js backend
+    
+    fetch('/stock/AddPortfolio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        stockName: stockData.symbol,
+        stockPrice: stockData.stockPrice,
+        quantity: stockData.quantity
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      alert(data.message);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("Failed to add stock to portfolio");
+    });
+    
+  };
+
+  document.getElementById("addToWatchlistBtn").onclick = function () {
+    const stockData = JSON.parse(this.getAttribute('data-stock'));
+    let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+    watchlist.push(stockData);
+    localStorage.setItem('watchlist', JSON.stringify(watchlist));
+    alert(`${stockData.symbol} added to Watchlist`);
+  };
   </script>
 </body>
 
