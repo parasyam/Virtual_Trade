@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InvestGo - Stock Details</title>
+  <title>Virtual Trade - Stock Details</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="/styles/stock-data.css">
 </head>
 
 <body>
   <nav>
-    <h1>Investfolio</h1>
+    <h1>Virtual Trade</h1>
     <div>
       <a href="/stock/portfolio">portfolio</a>
       <a href="/stock/get-watchlist">Watchlist</a>
@@ -185,11 +185,31 @@
 
   document.getElementById("addToWatchlistBtn").onclick = function () {
     const stockData = JSON.parse(this.getAttribute('data-stock'));
+
+    // Local Storage Update
     let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
     watchlist.push(stockData);
     localStorage.setItem('watchlist', JSON.stringify(watchlist));
-    alert(`${stockData.symbol} added to Watchlist`);
-  };
+
+    // Send to Backend
+    fetch('/add-watchlist/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'X-CSRFToken': getCSRFToken() // if using Django or CSRF protection
+        },
+        body: JSON.stringify(stockData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        alert(`${stockData.symbol} added to Watchlist`);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to add to Watchlist');
+    });
+};
   </script>
 </body>
 

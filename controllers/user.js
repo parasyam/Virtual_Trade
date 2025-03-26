@@ -9,8 +9,14 @@ require("dotenv").config();
 // const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
 // const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
 
+// const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
+// const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
+
 const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
-const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
+const RAPIDAPI_KEY=" 252591b063mshac5adcd5dc6681ap12fb32jsncf8be35cd00c";
+
+
+
 
 async function handleUserSignup(req, res) {
     const { name, email, password } = req.body;
