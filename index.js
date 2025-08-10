@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
@@ -27,9 +27,12 @@ app.use('/stock', stockRoute);
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
+
 // Database Connection
-connectDB("mongodb://127.0.0.1:27017/authDb").then(() => {
+connectDB(process.env.MONGO_URI).then(() => {
     console.log("DB CONNECTED");
+}).catch(err => {
+    console.error("DB CONNECTION ERROR:", err);
 });
 
 // Server
