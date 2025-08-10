@@ -3,20 +3,24 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const path = require("path");
 const User = require("../models/user");
-const { setUser, getUser,removeUser } = require('../service/auth');
+const { setUser, getUser, removeUser } = require('../service/auth');
 require("dotenv").config();
 
-// const RAPIDAPI_HOST = "real-time-finance-data.p.rapidapi.com";
-// const RAPIDAPI_KEY = "7953fbc373msh261e8a9a95783aap1a6958jsne93911bd74b4";
+// Put your API keys/hosts here in an array for round-robin
+const apiCredentials = [
+    { host: process.env.RAPIDAPI_HOST_1, key: process.env.RAPIDAPI_KEY_1 },
+    { host: process.env.RAPIDAPI_HOST_2, key: process.env.RAPIDAPI_KEY_2 },
+    { host: process.env.RAPIDAPI_HOST_3, key: process.env.RAPIDAPI_KEY_3 },
+];
 
-// const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
-// const RAPIDAPI_KEY="075e1f3f59mshb3ce46bc0a83b88p1631afjsnd500d40a50e3";
+let currentApiIndex = 0;
 
-const RAPIDAPI_HOST= "real-time-finance-data.p.rapidapi.com";
-const RAPIDAPI_KEY=" 252591b063mshac5adcd5dc6681ap12fb32jsncf8be35cd00c";
-
-
-
+// Round-robin selector
+function getNextApiCredentials() {
+    const creds = apiCredentials[currentApiIndex];
+    currentApiIndex = (currentApiIndex + 1) % apiCredentials.length;
+    return creds;
+}
 
 async function handleUserSignup(req, res) {
     const { name, email, password } = req.body;
@@ -52,19 +56,15 @@ async function handleUserLogin(req, res) {
     return res.redirect("/");
 }
 
-
 async function handleUserLogout(req, res) {
     const sessionId = req.cookies.uid;
 
     if (sessionId) {
-        
         removeUser(sessionId);
-       
         res.clearCookie('uid');
     }
     return res.redirect('/login');
 }
-
 
 async function handleStockDetails(req, res) {
     if (!req.user) {
@@ -75,40 +75,42 @@ async function handleStockDetails(req, res) {
     const symbol = `${sym}:NSE`;
 
     try {
-        // ✅ Parallel API calls with Promise.all() and timeout added
+        // Use round-robin for first API call
+        const { host: host1, key: key1 } = getNextApiCredentials();
+        // Use round-robin for second API call
+        const { host: host2, key: key2 } = getNextApiCredentials();
+
         const [stockResponse, incomeResponse] = await Promise.all([
             axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
                 params: { symbol, language: "en" },
                 headers: {
-                    "x-rapidapi-host": RAPIDAPI_HOST,
-                    "x-rapidapi-key": RAPIDAPI_KEY,
+                    "x-rapidapi-host": host1,
+                    "x-rapidapi-key": key1,
                 },
-                timeout: 5000 // ✅ Added timeout to avoid waiting too long
+                timeout: 5000
             }),
             axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
                 params: { symbol, period: "QUARTERLY", language: "en" },
                 headers: {
-                    "x-rapidapi-host": RAPIDAPI_HOST,
-                    "x-rapidapi-key": RAPIDAPI_KEY,
+                    "x-rapidapi-host": host2,
+                    "x-rapidapi-key": key2,
                 },
-                timeout: 5000 // ✅ Added timeout here as well
+                timeout: 5000
             })
         ]);
 
         const stockData = stockResponse.data;
         const incomeData = incomeResponse.data?.data?.income_statement || [];
 
-        // ✅ Process the latest 4 quarters
         const pastFourQuarters = incomeData.slice(0, 4).map((quarter) => ({
             period: quarter?.date || 'N/A',
-            revenue: quarter?.revenue ? (quarter.revenue / 10000000).toFixed(2) : 0,         // Convert to Cr
-            netIncome: quarter?.net_income ? (quarter.net_income / 10000000).toFixed(2) : 0, // Convert to Cr
+            revenue: quarter?.revenue ? (quarter.revenue / 10000000).toFixed(2) : 0,
+            netIncome: quarter?.net_income ? (quarter.net_income / 10000000).toFixed(2) : 0,
             eps: quarter?.earnings_per_share || 0,
             netProfitMargin: quarter?.net_profit_margin || 0,
-            EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0              // Convert to Cr
+            EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0
         }));
 
-        // ✅ Render with stock and income data
         if (stockData?.data?.price) {
             return res.render("stock_data", {
                 symbol: sym,
@@ -121,7 +123,7 @@ async function handleStockDetails(req, res) {
                 yearHigh: stockData.data.year_high,
                 dividend: stockData.data.company_dividend_yield,
                 industry: stockData.data.company_industry,
-                pastFourQuarters: pastFourQuarters
+                pastFourQuarters
             });
         } else {
             return res.render("stock_data", {
@@ -139,10 +141,7 @@ async function handleStockDetails(req, res) {
             });
         }
     } catch (error) {
-        // ✅ Improved error log with optional chaining
         console.error("Error fetching stock or income data:", error.response?.data || error.message);
-
-        // ✅ Render fallback view on error
         return res.render("stock_data", {
             symbol: sym,
             stockPrice: 0,
@@ -159,10 +158,9 @@ async function handleStockDetails(req, res) {
     }
 }
 
-
 async function handleAddPortfolio(req, res) {
     if (!req.user) {
-        res.render('login', { error: 'Invalid Email or Password' }); 
+        return res.render('login', { error: 'Invalid Email or Password' }); 
     }
 
     try {
@@ -177,21 +175,17 @@ async function handleAddPortfolio(req, res) {
         const qty = parseInt(quantity, 10);
         const totalCost = price * qty;
 
-        // Check if user has enough funds
         if (user.funds < totalCost) {
             return res.status(400).json({ error: "Insufficient funds to buy this stock" });
         }
 
-        // Check if stock already exists in portfolio
         const existingStockIndex = user.favoriteStocks.findIndex(stock => stock.name === stockName);
         if (existingStockIndex !== -1) {
-            // Average the price if already exists
             const existingStock = user.favoriteStocks[existingStockIndex];
             const totalQuantity = existingStock.quantity + qty;
             existingStock.price = ((existingStock.price * existingStock.quantity) + (price * qty)) / totalQuantity;
             existingStock.quantity = totalQuantity;
         } else {
-            // Add new stock
             const newStock = {
                 name: stockName,
                 price: price,
@@ -200,7 +194,6 @@ async function handleAddPortfolio(req, res) {
             user.favoriteStocks.push(newStock);
         }
 
-        // Deduct funds after buying
         user.funds -= totalCost;
         await user.save();
 
@@ -222,19 +215,18 @@ async function handlePortfolio(req, res) {
         let presentValue = 0;
         let apiFailed = false;
 
-        // ✅ Parallel API calls using Promise.all()
         const stockPromises = user.favoriteStocks.map(async (stock) => {
             let currentPrice = 0;
             try {
+                const { host, key } = getNextApiCredentials();
                 const response = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
                     params: { symbol: stock.name, language: "en" },
                     headers: {
-                        "x-rapidapi-host": RAPIDAPI_HOST,
-                        "x-rapidapi-key": RAPIDAPI_KEY,
+                        "x-rapidapi-host": host,
+                        "x-rapidapi-key": key,
                     },
                 });
-                const stockData = response.data;
-                currentPrice = stockData?.data?.price || 0;
+                currentPrice = response.data?.data?.price || 0;
             } catch (error) {
                 console.error(`Error fetching price for ${stock.name}:`, error.message);
                 apiFailed = true;
@@ -244,20 +236,18 @@ async function handlePortfolio(req, res) {
                 symbol: stock.name,
                 quantity: stock.quantity,
                 pastPrice: stock.price,
-                currentPrice: currentPrice,
+                currentPrice,
             };
         });
 
         const stocksData = await Promise.all(stockPromises);
 
-        // ✅ Calculate totalInvestment and presentValue
         if (!apiFailed) {
-            for (let stock of stocksData) {
+            for (const stock of stocksData) {
                 presentValue += stock.quantity * stock.currentPrice;
                 totalInvestment += stock.quantity * stock.pastPrice;
             }
         } else {
-            // Fallback if API fails
             presentValue = 0;
             totalInvestment = 0;
             stocksData.forEach(stock => stock.currentPrice = 0);
@@ -275,7 +265,6 @@ async function handlePortfolio(req, res) {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 }
-
 
 const handlesellStock = async (req, res) => {
     try {
@@ -302,11 +291,12 @@ const handlesellStock = async (req, res) => {
 
         let sellPrice = frontSellPrice;
         try {
+            const { host, key } = getNextApiCredentials();
             const response = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
                 params: { symbol: stock.name, language: "en" },
                 headers: {
-                    "x-rapidapi-host": process.env.RAPIDAPI_HOST,
-                    "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+                    "x-rapidapi-host": host,
+                    "x-rapidapi-key": key,
                 },
             });
             sellPrice = response.data?.data?.price || frontSellPrice;
@@ -317,14 +307,13 @@ const handlesellStock = async (req, res) => {
         const buyPrice = frontBuyPrice || stock.price;
         const profit = (sellPrice - buyPrice) * quantityToSell;
 
-
         stock.quantity -= quantityToSell;
         if (stock.quantity === 0) {
             user.favoriteStocks.splice(stockIndex, 1);
         }
 
         user.realizedProfit = (user.realizedProfit || 0) + profit;
-        user.AvaliableFunds= (user.AvaliableFunds || 0) + (sellPrice * quantityToSell);
+        user.AvaliableFunds = (user.AvaliableFunds || 0) + (sellPrice * quantityToSell);
         await user.save();
 
         return res.json({ message: "Stock sold successfully", realizedProfit: user.realizedProfit });
@@ -341,20 +330,20 @@ const handleGetWatchlist = async (req, res) => {
 
     try {
         const user = await User.findById(req.user._id);
-        if (!user){
-
-    return res.status(404).json({ error: "User not found" });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
 
         let watchlistData = [];
 
         for (let symbol of user.watchlist) {
             try {
+                const { host, key } = getNextApiCredentials();
                 const response = await axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
                     params: { symbol: `${symbol}:NSE`, language: "en" },
                     headers: {
-                        "x-rapidapi-host": RAPIDAPI_HOST,
-                        "x-rapidapi-key": RAPIDAPI_KEY,
+                        "x-rapidapi-host": host,
+                        "x-rapidapi-key": key,
                     },
                 });
 
@@ -386,6 +375,7 @@ const handleGetWatchlist = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
 const handleRemoveWatchlist = async (req, res) => {
     try {
         const { stockName } = req.body;
@@ -399,7 +389,6 @@ const handleRemoveWatchlist = async (req, res) => {
         }
         const stockIndex = user.watchlist.findIndex(stock => stock.toLowerCase() === stockName.toLowerCase());
 
-     
         if (stockIndex === -1) {
             return res.status(404).json({ error: "Stock not found in watchlist" });
         }
@@ -413,11 +402,9 @@ const handleRemoveWatchlist = async (req, res) => {
     }
 };
 
-
-  
-  
 const handleAddWatchlist = async (req, res) => {
-    if (!req.user) {return res.redirect("/login");
+    if (!req.user) {
+        return res.redirect("/login");
     }
     try {
         const { stockSymbol } = req.body;
@@ -430,7 +417,7 @@ const handleAddWatchlist = async (req, res) => {
             user.watchlist.push(stockSymbol);
             await user.save();
         }
-    
+
         res.json({ message: "Stock added to watchlist", watchlist: user.watchlist });
     } catch (error) {
         console.error(error);
@@ -438,7 +425,7 @@ const handleAddWatchlist = async (req, res) => {
     }
 };
 
-const handleDashbord=async (req, res) => {
+const handleDashbord = async (req, res) => {
     try {
         const users = await User.find().sort({ realizedProfit: -1 });
         res.render('dashboard', { users });
@@ -446,8 +433,6 @@ const handleDashbord=async (req, res) => {
         res.status(500).send('Error fetching leaderboard');
     }
 }
-
-
 
 module.exports = {
     handleUserSignup,
