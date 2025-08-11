@@ -8,9 +8,9 @@ require("dotenv").config();
 
 // Put your API keys/hosts here in an array for round-robin
 const apiCredentials = [
-    { host: process.env.RAPIDAPI_HOST_1, key: process.env.RAPIDAPI_KEY_1 },
+    // { host: process.env.RAPIDAPI_HOST_1, key: process.env.RAPIDAPI_KEY_1 },
     { host: process.env.RAPIDAPI_HOST_2, key: process.env.RAPIDAPI_KEY_2 },
-    { host: process.env.RAPIDAPI_HOST_3, key: process.env.RAPIDAPI_KEY_3 },
+    // { host: process.env.RAPIDAPI_HOST_3, key: process.env.RAPIDAPI_KEY_3 },
 ];
 
 let currentApiIndex = 0;
@@ -87,7 +87,7 @@ async function handleStockDetails(req, res) {
                     "x-rapidapi-host": host1,
                     "x-rapidapi-key": key1,
                 },
-                timeout: 5000
+                timeout: 10000
             }),
             axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
                 params: { symbol, period: "QUARTERLY", language: "en" },
@@ -95,7 +95,7 @@ async function handleStockDetails(req, res) {
                     "x-rapidapi-host": host2,
                     "x-rapidapi-key": key2,
                 },
-                timeout: 5000
+                timeout: 10000
             })
         ]);
 
