@@ -5,57 +5,69 @@ body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  line-height: 1.6;
-  overflow-x: hidden;
 }
-/* Additional styling for past income and cash flow sections */
-#past-income, #past-cash-flow {
-  background-color: #1e1e1e;
-  padding: 25px;
-  border-radius: 15px;
+/* Main container grid */
+#content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Box style */
+#content > div {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
   color: #e0e0e0;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
-#past-income h2, #past-cash-flow h2 {
+/* Make all boxes in same row match height */
+#content {
+  align-items: stretch; /* forces equal height in each row */
+}
+
+#content > div {
+  min-height: 100%;
+}
+
+/* Headings */
+#content h2,
+#content h4 {
   margin-top: 0;
-  margin-bottom: 20px;
-  color: #00ff99;
-  font-size: 1.4rem;
+  color: #00ff80;
 }
 
-/* Tables inside past income and cash flow */
-#past-income table, #past-cash-flow table {
+/* Tables inside boxes */
+#content table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
 }
 
-#past-income th, #past-income td,
-#past-cash-flow th, #past-cash-flow td {
-  padding: 10px 8px;
+#content th, #content td {
+  padding: 8px 12px;
   border: 1px solid #333;
-  text-align: center;
-  font-size: 0.9rem;
+  text-align: left;
 }
 
-#past-income th, #past-cash-flow th {
-  background-color: #2a2a2a;
-  color: #00ff99;
-  font-weight: 600;
+#content th {
+  background-color: #222;
+  color: #00ff80;
 }
 
-#past-income tr:nth-child(even),
-#past-cash-flow tr:nth-child(even) {
-  background-color: #252525;
+#content tr:nth-child(even) {
+  background-color: #1f1f1f;
 }
 
-#past-income tr:hover,
-#past-cash-flow tr:hover {
-  background-color: #034d34;
+/* Responsive: stack boxes */
+@media (max-width: 900px) {
+  #content {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -108,15 +120,11 @@ caption {
 
 nav {
   background-color: #111;
-  padding: 15px 5%;
+  padding: 10px 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 nav h1 {
@@ -141,40 +149,22 @@ h2, h3, h4 {
   font-weight: 400;
 }
 
-/* Content Layout - 2x2 Grid */
+/* Content Layout */
 #content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 25px;
-  padding: 30px 5%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-#div0 {
-  background-color: #1e1e1e;
-  padding: 25px;
-  border-radius: 15px;
-  color: #e0e0e0;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  border: 1px solid #333;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 30px 5%;
+  flex-wrap: wrap;
 }
 
-#stock-details {
+#div0, #stock-details {
   background-color: #1e1e1e;
-  padding: 25px;
+  padding: 20px;
   border-radius: 15px;
   color: #e0e0e0;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto repeat(3, 1fr);
-  gap: 15px;
-  align-items: stretch;
-  border: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  flex: 1 1 320px;
 }
 
 #div0 h4 {
@@ -183,26 +173,25 @@ h2, h3, h4 {
   margin-bottom: 15px;
 }
 
+/* Stock Details Grid */
 /* Stock Details Grid - 3x3 layout */
+#stock-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-rows: repeat(3, 1fr);    /* 3 rows */
+  gap: 20px;
+  align-items: stretch; /* Equal height cells */
+}
+
 .detail-item {
   background-color: #2a2a2a;
-  padding: 18px 15px;
-  border-radius: 12px;
+  padding: 15px;
+  border-radius: 10px;
   text-align: center;
   font-weight: 500;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: all 0.3s ease;
-  border: 1px solid #3a3a3a;
-  min-height: 80px;
-}
-
-.detail-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 255, 153, 0.3);
-  background-color: #333;
-  border-color: #00ff99;
 }
  
 
@@ -283,10 +272,8 @@ footer {
   justify-content: space-between;
   width: 100%;
   align-items: center;
-  gap: 20px;
-  margin: 30px auto;
-  max-width: 1400px;
-  padding: 0 5%;
+  gap: 15px;
+  margin-top: 30px;
 }
 
 .search-container {
@@ -377,25 +364,17 @@ footer {
   .heading {
     font-size: 28px;
   }
-
-  #content {
-    gap: 20px;
-    padding: 25px 4%;
-  }
 }
 
 @media (max-width: 768px) {
   nav {
     flex-direction: column;
     align-items: flex-start;
-    padding: 12px 4%;
   }
 
   #content {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, auto);
-    gap: 20px;
-    padding: 20px 4%;
+    flex-direction: column;
+    padding: 20px 5%;
   }
 
   .portfolio-overview {
@@ -403,72 +382,31 @@ footer {
   }
 
   #stock-details {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto repeat(5, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr;
   }
 
   .search-and-buttons {
     flex-direction: column;
     align-items: center;
-    padding: 0 4%;
   }
 
   #searchBox {
     width: 100%;
   }
-
-  #past-income th, #past-income td,
-  #past-cash-flow th, #past-cash-flow td {
-    padding: 8px 6px;
-    font-size: 0.8rem;
-  }
 }
 
 @media (max-width: 480px) {
   nav a {
-    margin-left: 8px;
-    font-size: 13px;
-  }
-
-  nav h1 {
-    font-size: 20px;
-  }
-
-  #content {
-    padding: 15px 3%;
-    gap: 15px;
-  }
-
-  #div0, #stock-details, #past-income, #past-cash-flow {
-    padding: 20px;
+    margin-left: 10px;
+    font-size: 14px;
   }
 
   .detail-item {
-    padding: 15px 12px;
-    min-height: 70px;
-    font-size: 0.9rem;
-  }
-
-  #stock-details {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto repeat(9, 1fr);
-    gap: 10px;
-  }
-
-  #stock-details h2 {
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-  }
-
-  #past-income h2, #past-cash-flow h2 {
-    font-size: 1.2rem;
-  }
-
-  #past-income th, #past-income td,
-  #past-cash-flow th, #past-cash-flow td {
-    padding: 6px 4px;
-    font-size: 0.75rem;
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
   }
 
   .overview-item {
@@ -480,10 +418,6 @@ footer {
   }
 
   .heading {
-    font-size: 22px;
-  }
-
-  .search-and-buttons {
-    margin: 20px auto;
+    font-size: 24px;
   }
 }

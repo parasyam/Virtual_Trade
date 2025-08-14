@@ -8,9 +8,9 @@ require("dotenv").config();
 
 // Put your API keys/hosts here in an array for round-robin
 const apiCredentials = [
-    // { host: process.env.RAPIDAPI_HOST_1, key: process.env.RAPIDAPI_KEY_1 },
+    { host: process.env.RAPIDAPI_HOST_1, key: process.env.RAPIDAPI_KEY_1 },
     { host: process.env.RAPIDAPI_HOST_2, key: process.env.RAPIDAPI_KEY_2 },
-    // { host: process.env.RAPIDAPI_HOST_3, key: process.env.RAPIDAPI_KEY_3 },
+    { host: process.env.RAPIDAPI_HOST_3, key: process.env.RAPIDAPI_KEY_3 },
 ];
 
 let currentApiIndex = 0;
@@ -33,7 +33,7 @@ async function handleUserSignup(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({ name, email, password: hashedPassword });
 
-    res.render('login', { error: 'Invalid Email or Password' }); 
+    res.render('login', { error: null }); 
 }
 
 async function handleUserLogin(req, res) {
@@ -75,32 +75,32 @@ async function handleStockDetails(req, res) {
     const symbol = `${sym}:NSE`;
 
     try {
-        // Use round-robin for first API call
+        // Get credentials for all three API calls
         const { host: host1, key: key1 } = getNextApiCredentials();
-        // Use round-robin for second API call
         const { host: host2, key: key2 } = getNextApiCredentials();
+        const { host: host3, key: key3 } = getNextApiCredentials();
 
-        const [stockResponse, incomeResponse] = await Promise.all([
+        const [stockResponse, incomeResponse, cashFlowResponse] = await Promise.all([
             axios.get("https://real-time-finance-data.p.rapidapi.com/stock-overview", {
                 params: { symbol, language: "en" },
-                headers: {
-                    "x-rapidapi-host": host1,
-                    "x-rapidapi-key": key1,
-                },
+                headers: { "x-rapidapi-host": host1, "x-rapidapi-key": key1 },
                 timeout: 10000
             }),
             axios.get("https://real-time-finance-data.p.rapidapi.com/company-income-statement", {
                 params: { symbol, period: "QUARTERLY", language: "en" },
-                headers: {
-                    "x-rapidapi-host": host2,
-                    "x-rapidapi-key": key2,
-                },
+                headers: { "x-rapidapi-host": host2, "x-rapidapi-key": key2 },
+                timeout: 10000
+            }),
+            axios.get("https://real-time-finance-data.p.rapidapi.com/company-cash-flow", {
+                params: { symbol, period: "QUARTERLY", language: "en" },
+                headers: { "x-rapidapi-host": host3, "x-rapidapi-key": key3 },
                 timeout: 10000
             })
         ]);
 
         const stockData = stockResponse.data;
         const incomeData = incomeResponse.data?.data?.income_statement || [];
+        const cashFlowData = cashFlowResponse.data?.data?.cash_flow || [];
 
         const pastFourQuarters = incomeData.slice(0, 4).map((quarter) => ({
             period: quarter?.date || 'N/A',
@@ -109,6 +109,16 @@ async function handleStockDetails(req, res) {
             eps: quarter?.earnings_per_share || 0,
             netProfitMargin: quarter?.net_profit_margin || 0,
             EBITDA: quarter?.EBITDA ? (quarter.EBITDA / 10000000).toFixed(2) : 0
+        }));
+
+        const pastFourCashFlows = cashFlowData.slice(0, 4).map((flow) => ({
+            period: flow?.date || 'N/A',
+            netIncome: flow?.net_income ? (flow.net_income / 10000000).toFixed(2) : 0,
+            cashFromOperations: flow?.cash_from_operations ? (flow.cash_from_operations / 10000000).toFixed(2) : 0,
+            cashFromInvesting: flow?.cash_from_investing ? (flow.cash_from_investing / 10000000).toFixed(2) : 0,
+            cashFromFinancing: flow?.cash_from_financing ? (flow.cash_from_financing / 10000000).toFixed(2) : 0,
+            netChangeInCash: flow?.net_change_in_cash ? (flow.net_change_in_cash / 10000000).toFixed(2) : 0,
+            freeCashFlow: flow?.free_cash_flow ? (flow.free_cash_flow / 10000000).toFixed(2) : 0
         }));
 
         if (stockData?.data?.price) {
@@ -123,7 +133,8 @@ async function handleStockDetails(req, res) {
                 yearHigh: stockData.data.year_high,
                 dividend: stockData.data.company_dividend_yield,
                 industry: stockData.data.company_industry,
-                pastFourQuarters
+                pastFourQuarters,
+                pastFourCashFlows
             });
         } else {
             return res.render("stock_data", {
@@ -137,11 +148,12 @@ async function handleStockDetails(req, res) {
                 yearHigh: 0,
                 dividend: 0,
                 industry: "N/A",
-                pastFourQuarters: []
+                pastFourQuarters: [],
+                pastFourCashFlows: []
             });
         }
     } catch (error) {
-        console.error("Error fetching stock or income data:", error.response?.data || error.message);
+        console.error("Error fetching stock, income, or cash flow data:", error.response?.data || error.message);
         return res.render("stock_data", {
             symbol: sym,
             stockPrice: 0,
@@ -153,7 +165,8 @@ async function handleStockDetails(req, res) {
             yearHigh: 0,
             dividend: 0,
             industry: "N/A",
-            pastFourQuarters: []
+            pastFourQuarters: [],
+            pastFourCashFlows: []
         });
     }
 }

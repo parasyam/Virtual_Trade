@@ -16,10 +16,18 @@
   <nav>
     <h1>Virtual Trade</h1>
     <div>
-      <a href="/login">Login</a>
-      <a href="/signup">Register</a>
-      <a href="/stock-search">Stocks</a>
-      <a href="/stock/leaderboard">Leaderboard</a>
+      <% if (user) { %>
+        <a href="/stock/portfolio">Portfolio</a>
+        <a href="/stock/get-watchlist">Watchlist</a>
+        <a href="/stock-search">Stocks</a>
+        <a href="/stock/leaderboard">Leaderboard</a>
+        <a href="/user/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Register</a>
+        <a href="/stock-search">Stocks</a>
+        <a href="/stock/leaderboard">Leaderboard</a>
+      <% } %>
     </div>
   </nav>
 
@@ -27,7 +35,11 @@
     <h2>Trade Virtually. Learn Fearlessly.</h2>
     <p>Welcome to Virtual Trade! Practice real-time stock trading in the Indian equity market using virtual money.
       Compete with others, manage your portfolio, and rank on the leaderboard. Start your trading journey risk-free!</p>
-    <a href="/stock/portfolio" class="btn">Start Trading</a>
+    <% if (user) { %>
+      <a href="/stock/portfolio" class="btn">View Portfolio</a>
+    <% } else { %>
+      <a href="/signup" class="btn">Start Trading</a>
+    <% } %>
   </section>
 
   <section class="features">

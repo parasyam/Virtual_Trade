@@ -1,8 +1,9 @@
 const express=require('express');
+const {cheackAuth} = require('../middleware/auth');
 const router=express.Router();
-router.get('/',(req,res)=>{
+router.get('/', cheackAuth, (req,res)=>{
     
-    return res.render('home');
+    return res.render('home', { user: req.user });
 });
 router.get('/signup',(req,res)=>{
     return res.render('signup',{ error: null });

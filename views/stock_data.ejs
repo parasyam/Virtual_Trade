@@ -11,8 +11,9 @@
 
 <body>
   <nav>
-    <h1>Virtual Trade</h1>
+    <h1><a href="/">Virtual Trade</a></h1>
     <div>
+      <a href="/">Home</a>
       <a href="/stock/portfolio">portfolio</a>
       <a href="/stock/get-watchlist">Watchlist</a>
       <a href="/stock/leaderboard">Leaderboard</a>
@@ -105,6 +106,69 @@
       <% } else { %>
         <p>No past income data available.</p>
       <% } %>
+      </div>
+
+      <!-- Past 4 Quarters Cash Flow Section -->
+<div id="past-cash-flow">
+  <h2>Past 4 Quarters Cash Flow</h2>
+
+  <% if (pastFourCashFlows && pastFourCashFlows.length > 0) { %>
+    <table border="1">
+      <tr>
+        <th>Quarter</th>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <th><%= flow.period %></th>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Net Income (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.netIncome %> Cr</td>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Cash From Operations (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.cashFromOperations %> Cr</td>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Cash From Investing (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.cashFromInvesting %> Cr</td>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Cash From Financing (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.cashFromFinancing %> Cr</td>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Net Change in Cash (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.netChangeInCash %> Cr</td>
+        <% }); %>
+      </tr>
+
+      <tr>
+        <td>Free Cash Flow (Cr)</td>
+        <% pastFourCashFlows.forEach(flow => { %>
+          <td><%= flow.freeCashFlow %> Cr</td>
+        <% }); %>
+      </tr>
+    </table>
+  <% } else { %>
+    <p>No cash flow data available.</p>
+  <% } %>
+</div>
+
+
     </div>
 
     
@@ -192,13 +256,12 @@
     localStorage.setItem('watchlist', JSON.stringify(watchlist));
 
     // Send to Backend
-    fetch('/add-watchlist/', {
+    fetch('/stock/add-watchlist', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRFToken': getCSRFToken() // if using Django or CSRF protection
         },
-        body: JSON.stringify(stockData)
+        body: JSON.stringify({ stockSymbol: stockData.symbol })
     })
     .then(response => response.json())
     .then(data => {
